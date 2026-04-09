@@ -219,6 +219,29 @@ def isabela_sweep():
     )
 
 
+TUCKER_EPSILONS = [1, 0.5, 0.1, 0.05, 0.01, 0.005, 0.001, 1e-4, 1e-5, 1e-6]
+
+def tucker_sweep():
+    tests = [
+        {
+            "compressor": "tucker",
+            "options": {
+                "epsilon": str(ep),
+            },
+            "normalize": False,
+            "chunkSize": c,
+            "iterations": ITERATIONS
+        }
+        for ep in TUCKER_EPSILONS
+        for c in CHUNK_SIZES
+    ]
+
+    write_config(
+        make_config(ALL_BRANCHES, tests),
+        "tucker-sweep-config.json"
+    )
+
+
 def main():
     trunc_sweep()
     sz3_sweep()
@@ -226,6 +249,7 @@ def main():
     mgard_sweep()
     zfpx_sweep()
     isabela_sweep()
+    tucker_sweep()
 
 if __name__ == "__main__":
     main()
