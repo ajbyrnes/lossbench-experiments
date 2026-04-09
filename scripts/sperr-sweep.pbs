@@ -1,0 +1,35 @@
+#!/bin/bash
+#PBS -N sperr_sweep_new
+#PBS -A UIC-HPC
+#PBS -l select=1:ncpus=1:mem=16gb
+#PBS -l walltime=01:30:00
+#PBS -l filesystems=home:eagle
+#PBS -o /eagle/UIC-HPC/amy/sweep.out
+#PBS -e /eagle/UIC-HPC/amy/sweep.err
+#PBS -m bea
+#PBS -M ajbyrne2@uic.edu
+
+cd $PBS_O_WORKDIR
+
+module use /soft/modulefiles
+module load spack-pe-base
+module load conda/2025-06-03
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate lossbench
+
+# Results directory and file setup
+script_name=$(basename "$0")
+timestamp=$(date +"%Y%m%d_%H%M%S")
+
+compressor="sperr"
+
+results_dir="/eagle/UIC-HPC/amy/${compressor}-sweep.${timestamp}"
+mkdir -p "$results_dir"
+
+results_file="$results_dir/results.jsonl"
+log_file="$results_dir/benchmark.log"
+
+./lossbench \
+    --resultsFile "$results_file" \
+    --configFile "${compressor}-sweep-config.json" \
+    >> "$log_file" 2>&1
