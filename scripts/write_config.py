@@ -190,12 +190,42 @@ def zfpx_sweep():
         "zfpx-sweep-config.json"
     )
     
+ISABELA_TRANSFORMS = ["bsplines", "wavelets"]
+ISABELA_ERROR_RATES = [1, 0.5, 0.1, 0.05, 0.01, 0.005, 0.001]
+ISABELA_NCOEFFICIENTS = [10, 20, 30, 40, 50]
+
+def isabela_sweep():
+    tests = [
+        {
+            "compressor": "isabela",
+            "options": {
+                "transform": t,
+                "errorRate": str(er),
+                "ncoefficients": str(nc),
+            },
+            "normalize": False,
+            "chunkSize": c,
+            "iterations": ITERATIONS
+        }
+        for t in ISABELA_TRANSFORMS
+        for er in ISABELA_ERROR_RATES
+        for nc in ISABELA_NCOEFFICIENTS
+        for c in CHUNK_SIZES
+    ]
+
+    write_config(
+        make_config(ALL_BRANCHES, tests),
+        "isabela-sweep-config.json"
+    )
+
+
 def main():
     trunc_sweep()
     sz3_sweep()
     sperr_sweep()
     mgard_sweep()
     zfpx_sweep()
+    isabela_sweep()
 
 if __name__ == "__main__":
     main()
